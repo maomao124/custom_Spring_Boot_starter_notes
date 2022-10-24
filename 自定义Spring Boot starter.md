@@ -551,7 +551,6 @@ hello-spring-boot-starter的pom文件：
     <version>0.0.1</version>
     <name>hello-spring-boot-starter</name>
     <description>hello-spring-boot-starter</description>
-    <packaging>pom</packaging>
 
     <properties>
         <java.version>11</java.version>
@@ -564,10 +563,21 @@ hello-spring-boot-starter的pom文件：
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!--spring boot starter开发依赖-->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
         </dependency>
 
     </dependencies>
@@ -577,11 +587,15 @@ hello-spring-boot-starter的pom文件：
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
             </plugin>
         </plugins>
     </build>
 
 </project>
+
 ```
 
 
@@ -617,7 +631,7 @@ use-starter的pom文件：
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
         <dependency>
@@ -660,7 +674,7 @@ use-starter的pom文件：
 [INFO] Reactor Build Order:
 [INFO] 
 [INFO] spring_boot_starter_demo                                           [pom]
-[INFO] hello-spring-boot-starter                                          [pom]
+[INFO] hello-spring-boot-starter                                          [jar]
 [INFO] use-starter                                                        [jar]
 [INFO] 
 [INFO] --------------------< mao:spring_boot_starter_demo >--------------------
@@ -671,7 +685,29 @@ use-starter的pom文件：
 [INFO] 
 [INFO] -------------------< mao:hello-spring-boot-starter >--------------------
 [INFO] Building hello-spring-boot-starter 0.0.1                           [2/3]
-[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.2.0:resources (default-resources) @ hello-spring-boot-starter ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] Copying 0 resource
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.10.1:compile (default-compile) @ hello-spring-boot-starter ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:3.2.0:testResources (default-testResources) @ hello-spring-boot-starter ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] skip non existing resourceDirectory H:\程序\大四上期\spring_boot_starter_demo\hello-spring-boot-starter\src\test\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.10.1:testCompile (default-testCompile) @ hello-spring-boot-starter ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.22.2:test (default-test) @ hello-spring-boot-starter ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- maven-jar-plugin:3.2.2:jar (default-jar) @ hello-spring-boot-starter ---
 [INFO] 
 [INFO] --- spring-boot-maven-plugin:2.7.1:repackage (repackage) @ hello-spring-boot-starter ---
 [INFO] 
@@ -686,7 +722,8 @@ use-starter的pom文件：
 [INFO] Copying 0 resource
 [INFO] 
 [INFO] --- maven-compiler-plugin:3.10.1:compile (default-compile) @ use-starter ---
-[INFO] Nothing to compile - all classes are up to date
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 2 source files to H:\程序\大四上期\spring_boot_starter_demo\use-starter\target\classes
 [INFO] 
 [INFO] --- maven-resources-plugin:3.2.0:testResources (default-testResources) @ use-starter ---
 [INFO] Using 'UTF-8' encoding to copy filtered resources.
@@ -694,26 +731,28 @@ use-starter的pom文件：
 [INFO] skip non existing resourceDirectory H:\程序\大四上期\spring_boot_starter_demo\use-starter\src\test\resources
 [INFO] 
 [INFO] --- maven-compiler-plugin:3.10.1:testCompile (default-testCompile) @ use-starter ---
-[INFO] Nothing to compile - all classes are up to date
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to H:\程序\大四上期\spring_boot_starter_demo\use-starter\target\test-classes
 [INFO] 
 [INFO] --- maven-surefire-plugin:2.22.2:test (default-test) @ use-starter ---
 [INFO] Tests are skipped.
 [INFO] 
 [INFO] --- maven-jar-plugin:3.2.2:jar (default-jar) @ use-starter ---
+[INFO] Building jar: H:\程序\大四上期\spring_boot_starter_demo\use-starter\target\use-starter-0.0.1-SNAPSHOT.jar
 [INFO] 
 [INFO] --- spring-boot-maven-plugin:2.7.1:repackage (repackage) @ use-starter ---
 [INFO] Replacing main artifact with repackaged archive
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
 [INFO] 
-[INFO] spring_boot_starter_demo 0.0.1 ..................... SUCCESS [  0.767 s]
-[INFO] hello-spring-boot-starter 0.0.1 .................... SUCCESS [  0.276 s]
-[INFO] use-starter 0.0.1-SNAPSHOT ......................... SUCCESS [  1.206 s]
+[INFO] spring_boot_starter_demo 0.0.1 ..................... SUCCESS [  0.833 s]
+[INFO] hello-spring-boot-starter 0.0.1 .................... SUCCESS [  1.282 s]
+[INFO] use-starter 0.0.1-SNAPSHOT ......................... SUCCESS [  1.738 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  2.611 s
-[INFO] Finished at: 2022-10-24T20:20:42+08:00
+[INFO] Total time:  4.189 s
+[INFO] Finished at: 2022-10-24T22:02:54+08:00
 [INFO] ------------------------------------------------------------------------
 ```
 
@@ -898,4 +937,388 @@ public class HelloConfigProperties
 **第三步：创建HelloService**
 
 
+
+```java
+package mao.hellospringbootstarter.service;
+
+import mao.hellospringbootstarter.config.HelloConfigProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * Project name(项目名称)：spring_boot_starter_demo
+ * Package(包名): mao.hellospringbootstarter.service
+ * Class(类名): HelloService
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/24
+ * Time(创建时间)： 20:33
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+//@Service
+public class HelloService
+{
+    /**
+     * 配置属性类
+     */
+    private final HelloConfigProperties helloConfigProperties;
+
+    @Autowired
+    public HelloService(HelloConfigProperties helloConfigProperties)
+    {
+        this.helloConfigProperties = helloConfigProperties;
+    }
+
+    /**
+     * hello
+     *
+     * @return {@link String}
+     */
+    public String hello()
+    {
+        return "你好！我的名字是" + helloConfigProperties.getName() +
+                ",年龄是：" + helloConfigProperties.getAge() +
+                ",地址是：" + helloConfigProperties.getAddress() +
+                ",性别是：" + helloConfigProperties.getSex();
+    }
+}
+
+```
+
+
+
+
+
+**第四步：创建自动配置类HelloServiceAutoConfiguration**
+
+
+
+```java
+package mao.hellospringbootstarter.config;
+
+import mao.hellospringbootstarter.service.HelloService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
+
+/**
+ * Project name(项目名称)：spring_boot_starter_demo
+ * Package(包名): mao.hellospringbootstarter.config
+ * Class(类名): HelloServiceAutoConfiguration
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/24
+ * Time(创建时间)： 20:38
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+@Configuration
+@EnableConfigurationProperties(HelloConfigProperties.class)
+//@ComponentScan(basePackageClasses = {HelloService.class})
+public class HelloServiceAutoConfiguration
+{
+
+    /**
+     * 日志
+     */
+    private static final Logger log = LoggerFactory.getLogger(HelloServiceAutoConfiguration.class);
+
+    @Bean
+    @ConditionalOnMissingBean
+    public HelloService helloService(@Autowired HelloConfigProperties helloConfigProperties)
+    {
+        log.info("初始化bean:HelloService");
+        return new HelloService(helloConfigProperties);
+    }
+
+    @PostConstruct
+    public void init()
+    {
+        log.info("初始化bean");
+    }
+
+}
+
+```
+
+
+
+
+
+
+
+
+
+**第五步：在resources目录下创建META-INF/spring.factories**
+
+
+
+```
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  mao.hellospringbootstarter.config.HelloServiceAutoConfiguration
+```
+
+
+
+![image-20221024204707847](img/自定义Spring Boot starter/image-20221024204707847.png)
+
+
+
+
+
+至此starter已经开发完成了，可以将当前starter安装到本地maven仓库供其他应用来使用
+
+
+
+结构：
+
+![image-20221024205127736](img/自定义Spring Boot starter/image-20221024205127736.png)
+
+
+
+
+
+
+
+
+
+#### 使用starter
+
+
+
+**第一步：在use-starter子工程中修改pom文件**
+
+
+
+导入hello-spring-boot-starter
+
+
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+
+        <artifactId>spring_boot_starter_demo</artifactId>
+        <groupId>mao</groupId>
+        <version>0.0.1</version>
+
+    </parent>
+
+    <artifactId>use-starter</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>use-starter</name>
+    <description>use-starter</description>
+
+    <properties>
+        <java.version>11</java.version>
+    </properties>
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>mao</groupId>
+            <artifactId>hello-spring-boot-starter</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+
+
+
+
+
+
+**第二步：创建application.yml文件添加配置**
+
+
+
+```yaml
+server:
+  port: 9090
+
+hello:
+  name: 张三
+  sex: 男
+  age: 18
+  address: 中国
+```
+
+
+
+
+
+
+
+**第三步：创建HelloController**
+
+
+
+```java
+package mao.usestarter.controller;
+
+import mao.hellospringbootstarter.service.HelloService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * Project name(项目名称)：spring_boot_starter_demo
+ * Package(包名): mao.usestarter.controller
+ * Class(类名): HelloController
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/24
+ * Time(创建时间)： 20:55
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+@RestController
+public class HelloController
+{
+    @Autowired
+    private HelloService helloService;
+
+
+    @GetMapping("/test")
+    public String test()
+    {
+        return helloService.hello();
+    }
+}
+```
+
+
+
+
+
+
+
+**第四步：启动项目**
+
+
+
+```sh
+ .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v2.7.1)
+
+2022-10-24 22:09:13.951  INFO 12768 --- [           main] mao.usestarter.UseStarterApplication     : Starting UseStarterApplication using Java 16.0.2 on mao with PID 12768 (H:\程序\大四上期\spring_boot_starter_demo\use-starter\target\classes started by mao in H:\程序\大四上期\spring_boot_starter_demo)
+2022-10-24 22:09:13.953  INFO 12768 --- [           main] mao.usestarter.UseStarterApplication     : No active profile set, falling back to 1 default profile: "default"
+2022-10-24 22:09:14.641  INFO 12768 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8086 (http)
+2022-10-24 22:09:14.649  INFO 12768 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-10-24 22:09:14.649  INFO 12768 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
+2022-10-24 22:09:14.723  INFO 12768 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-10-24 22:09:14.723  INFO 12768 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 722 ms
+2022-10-24 22:09:14.759  INFO 12768 --- [           main] m.h.c.HelloServiceAutoConfiguration      : 初始化bean
+2022-10-24 22:09:14.768  INFO 12768 --- [           main] m.h.c.HelloServiceAutoConfiguration      : 初始化bean:HelloService
+2022-10-24 22:09:14.982  INFO 12768 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8086 (http) with context path ''
+2022-10-24 22:09:14.991  INFO 12768 --- [           main] mao.usestarter.UseStarterApplication     : Started UseStarterApplication in 1.347 seconds (JVM running for 1.808)
+```
+
+
+
+
+
+
+
+**第五步：访问**
+
+http://localhost:8086/test
+
+
+
+![image-20221024221011612](img/自定义Spring Boot starter/image-20221024221011612.png)
+
+
+
+
+
+**第六步：更改配置**
+
+
+
+```yaml
+server:
+  port: 8086
+
+hello:
+  name: 张三
+  sex: 男
+  age: 21
+  address: 中国
+```
+
+
+
+
+
+**第七步：重启服务器，再次访问**
+
+
+
+![image-20221024221131743](img/自定义Spring Boot starter/image-20221024221131743.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 案例二
 
