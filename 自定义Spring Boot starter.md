@@ -284,3 +284,146 @@ Spring Boot之所以能够帮我们简化项目的搭建和开发过程，主要
 
 #### Bean的发现
 
+spring boot默认扫描启动类所在的包下的主类与子类的所有组件，但并没有包括依赖包中的类，那么依赖包中的bean是如何被发现和加载的？
+
+我们需要从Spring Boot项目的启动类开始跟踪，在启动类上我们一般会加入SpringBootApplication注解
+
+
+
+![image-20221024194425682](img/自定义Spring Boot starter/image-20221024194425682.png)
+
+
+
+
+
+![image-20221024194530754](img/自定义Spring Boot starter/image-20221024194530754.png)
+
+
+
+
+
+**SpringBootConfiguration**：作用就相当于**Configuration**注解，被注解的类将成为一个bean配置类
+
+**ComponentScan**：作用就是自动扫描并加载符合条件的组件，最终将这些bean加载到spring容器中
+
+**EnableAutoConfiguration** ：这个注解很重要，借助@**Import**的支持，收集和注册依赖包中相关的bean定义
+
+
+
+
+
+继续跟踪**EnableAutoConfiguration**注解源码：
+
+
+
+![image-20221024194708797](img/自定义Spring Boot starter/image-20221024194708797.png)
+
+
+
+
+
+@**EnableAutoConfiguration**注解引入了@**Import**这个注解。
+
+**Import**：导入需要自动配置的组件
+
+
+
+
+
+继续跟踪**AutoConfigurationImportSelector**类源码：
+
+
+
+![image-20221024195114315](img/自定义Spring Boot starter/image-20221024195114315.png)
+
+
+
+
+
+**AutoConfigurationImportSelector**类的getCandidateConfigurations方法中的调用了SpringFactoriesLoader类的loadFactoryNames方法
+
+
+
+
+
+
+
+![image-20221024195214086](img/自定义Spring Boot starter/image-20221024195214086.png)
+
+
+
+
+
+**SpringFactoriesLoader**的**loadFactoryNames**静态方法可以从所有的jar包中读取META-INF/spring.factories文件，而自动配置的类就在这个文件中进行配置：
+
+
+
+
+
+![image-20221024195247959](img/自定义Spring Boot starter/image-20221024195247959.png)
+
+
+
+
+
+spring.factories文件内容如下：
+
+
+
+![image-20221024195309694](img/自定义Spring Boot starter/image-20221024195309694.png)
+
+
+
+```
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.mybatis.spring.boot.autoconfigure.MybatisLanguageDriverAutoConfiguration,\
+org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration
+```
+
+
+
+
+
+这样Spring Boot就可以加载到**MybatisAutoConfiguration**这个配置类了
+
+
+
+
+
+
+
+
+
+
+
+#### Bean的加载
+
+在Spring Boot应用中要让一个普通类交给Spring容器管理，通常有以下方法：
+
+* 使用 @Configuration与@Bean 注解
+
+* 使用@Controller @Service @Repository @Component 注解标注该类并且启用@ComponentScan自动扫描
+
+* 使用@Import 方法
+
+其中Spring Boot实现自动配置使用的是@Import注解这种方式，AutoConfigurationImportSelector类的selectImports方法返回一组从META-INF/spring.factories文件中读取的bean的全类名，这样Spring Boot就可以加载到这些Bean并完成实例的创建工作。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 自定义starter
+
