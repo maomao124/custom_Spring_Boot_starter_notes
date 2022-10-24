@@ -427,3 +427,475 @@ org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration
 
 ## 自定义starter
 
+### 案例一
+
+#### 开发starter
+
+
+
+**第一步：初始化项目**
+
+
+
+创建一个名字为spring_boot_starter_demo的父工程
+
+
+
+创建一个名字为hello-spring-boot-starter的子工程，此工程用于开发starter给使用者使用
+
+
+
+![image-20221024200054073](img/自定义Spring Boot starter/image-20221024200054073.png)
+
+
+
+
+
+创建一个名字为use-starter的子工程，此工程用于使用之前的的starter
+
+
+
+
+
+目录结构如下
+
+![image-20221024201126327](img/自定义Spring Boot starter/image-20221024201126327.png)
+
+
+
+
+
+
+
+父工程的pom文件：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.1</version>
+        <relativePath/>
+    </parent>
+
+
+    <groupId>mao</groupId>
+    <artifactId>spring_boot_starter_demo</artifactId>
+    <version>0.0.1</version>
+    <name>spring_boot_starter_demo</name>
+    <description>spring_boot_starter_demo</description>
+    <packaging>pom</packaging>
+
+
+    <properties>
+        <java.version>11</java.version>
+    </properties>
+
+    <modules>
+
+        <module>hello-spring-boot-starter</module>
+        <module>use-starter</module>
+
+    </modules>
+
+    <dependencies>
+
+
+    </dependencies>
+
+    <dependencyManagement>
+
+        <dependencies>
+
+
+        </dependencies>
+
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+
+
+
+
+hello-spring-boot-starter的pom文件：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>spring_boot_starter_demo</artifactId>
+        <groupId>mao</groupId>
+        <version>0.0.1</version>
+    </parent>
+
+    <artifactId>hello-spring-boot-starter</artifactId>
+    <version>0.0.1</version>
+    <name>hello-spring-boot-starter</name>
+    <description>hello-spring-boot-starter</description>
+    <packaging>pom</packaging>
+
+    <properties>
+        <java.version>11</java.version>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+
+
+
+
+use-starter的pom文件：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+
+        <artifactId>spring_boot_starter_demo</artifactId>
+        <groupId>mao</groupId>
+        <version>0.0.1</version>
+
+    </parent>
+
+    <artifactId>use-starter</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>use-starter</name>
+    <description>use-starter</description>
+
+    <properties>
+        <java.version>11</java.version>
+    </properties>
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+
+
+
+
+
+
+![image-20221024201941540](img/自定义Spring Boot starter/image-20221024201941540.png)
+
+
+
+
+
+打包测试项目是否配置正确
+
+```sh
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] spring_boot_starter_demo                                           [pom]
+[INFO] hello-spring-boot-starter                                          [pom]
+[INFO] use-starter                                                        [jar]
+[INFO] 
+[INFO] --------------------< mao:spring_boot_starter_demo >--------------------
+[INFO] Building spring_boot_starter_demo 0.0.1                            [1/3]
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:2.7.1:repackage (repackage) @ spring_boot_starter_demo ---
+[INFO] 
+[INFO] -------------------< mao:hello-spring-boot-starter >--------------------
+[INFO] Building hello-spring-boot-starter 0.0.1                           [2/3]
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:2.7.1:repackage (repackage) @ hello-spring-boot-starter ---
+[INFO] 
+[INFO] --------------------------< mao:use-starter >---------------------------
+[INFO] Building use-starter 0.0.1-SNAPSHOT                                [3/3]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.2.0:resources (default-resources) @ use-starter ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] Copying 1 resource
+[INFO] Copying 0 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.10.1:compile (default-compile) @ use-starter ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:3.2.0:testResources (default-testResources) @ use-starter ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] skip non existing resourceDirectory H:\程序\大四上期\spring_boot_starter_demo\use-starter\src\test\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.10.1:testCompile (default-testCompile) @ use-starter ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.22.2:test (default-test) @ use-starter ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- maven-jar-plugin:3.2.2:jar (default-jar) @ use-starter ---
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:2.7.1:repackage (repackage) @ use-starter ---
+[INFO] Replacing main artifact with repackaged archive
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] spring_boot_starter_demo 0.0.1 ..................... SUCCESS [  0.767 s]
+[INFO] hello-spring-boot-starter 0.0.1 .................... SUCCESS [  0.276 s]
+[INFO] use-starter 0.0.1-SNAPSHOT ......................... SUCCESS [  1.206 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.611 s
+[INFO] Finished at: 2022-10-24T20:20:42+08:00
+[INFO] ------------------------------------------------------------------------
+```
+
+
+
+
+
+没有报错
+
+
+
+
+
+
+
+**第二步：创建配置属性类HelloConfigProperties**
+
+
+
+```java
+package mao.hellospringbootstarter.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+/**
+ * Project name(项目名称)：spring_boot_starter_demo
+ * Package(包名): mao.hellospringbootstarter.config
+ * Class(类名): HelloConfigProperties
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/24
+ * Time(创建时间)： 20:23
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+@ConfigurationProperties(prefix = "hello")
+public class HelloConfigProperties
+{
+    /**
+     * 名字
+     */
+    private String name;
+    /**
+     * 性
+     */
+    private String sex;
+    /**
+     * 年龄
+     */
+    private String age;
+    /**
+     * 地址
+     */
+    private String address;
+
+    /**
+     * Instantiates a new Hello config properties.
+     */
+    public HelloConfigProperties()
+    {
+    }
+
+    /**
+     * Instantiates a new Hello config properties.
+     *
+     * @param name    the name
+     * @param sex     the sex
+     * @param age     the age
+     * @param address the address
+     */
+    public HelloConfigProperties(String name, String sex, String age, String address)
+    {
+        this.name = name;
+        this.sex = sex;
+        this.age = age;
+        this.address = address;
+    }
+
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    /**
+     * Gets sex.
+     *
+     * @return the sex
+     */
+    public String getSex()
+    {
+        return sex;
+    }
+
+    /**
+     * Sets sex.
+     *
+     * @param sex the sex
+     */
+    public void setSex(String sex)
+    {
+        this.sex = sex;
+    }
+
+    /**
+     * Gets age.
+     *
+     * @return the age
+     */
+    public String getAge()
+    {
+        return age;
+    }
+
+    /**
+     * Sets age.
+     *
+     * @param age the age
+     */
+    public void setAge(String age)
+    {
+        this.age = age;
+    }
+
+    /**
+     * Gets address.
+     *
+     * @return the address
+     */
+    public String getAddress()
+    {
+        return address;
+    }
+
+    /**
+     * Sets address.
+     *
+     * @param address the address
+     */
+    public void setAddress(String address)
+    {
+        this.address = address;
+    }
+
+    @Override
+    @SuppressWarnings("all")
+    public String toString()
+    {
+        final StringBuilder stringbuilder = new StringBuilder();
+        stringbuilder.append("name：").append(name).append('\n');
+        stringbuilder.append("sex：").append(sex).append('\n');
+        stringbuilder.append("age：").append(age).append('\n');
+        stringbuilder.append("address：").append(address).append('\n');
+        return stringbuilder.toString();
+    }
+}
+```
+
+
+
+
+
+
+
+**第三步：创建HelloService**
+
+
+
