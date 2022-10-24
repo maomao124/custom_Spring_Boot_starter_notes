@@ -1322,3 +1322,509 @@ hello:
 
 ### 案例二
 
+说明：通过自动配置来创建一个拦截器对象，通过此拦截器对象来实现记录日志功能
+
+
+
+
+
+#### 开发starter
+
+
+
+**第一步：初始化项目**
+
+
+
+创建父工程spring_boot_starter_demo2
+
+
+
+![image-20221024221750362](img/自定义Spring Boot starter/image-20221024221750362.png)
+
+
+
+
+
+创建子工程log-spring-boot-starter
+
+
+
+![image-20221024222136042](img/自定义Spring Boot starter/image-20221024222136042.png)
+
+
+
+
+
+创建子工程use-starter
+
+
+
+![image-20221024222228838](img/自定义Spring Boot starter/image-20221024222228838.png)
+
+
+
+
+
+
+
+
+
+结构：
+
+![image-20221024222838666](img/自定义Spring Boot starter/image-20221024222838666.png)
+
+
+
+
+
+
+
+父工程spring_boot_starter_demo2的pom文件：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.1</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>mao</groupId>
+    <artifactId>spring_boot_starter_demo2</artifactId>
+    <version>0.0.1</version>
+    <name>spring_boot_starter_demo2</name>
+    <description>spring_boot_starter_demo2</description>
+    <packaging>pom</packaging>
+
+    <properties>
+        <java.version>11</java.version>
+    </properties>
+
+    <modules>
+
+        <module>log-spring-boot-starter</module>
+        <module>use-starter</module>
+
+    </modules>
+
+    <dependencies>
+
+
+    </dependencies>
+
+    <dependencyManagement>
+
+        <dependencies>
+
+
+        </dependencies>
+
+    </dependencyManagement>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+
+
+
+
+
+
+
+
+子工程log-spring-boot-starter的pom文件：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+
+        <artifactId>spring_boot_starter_demo2</artifactId>
+        <groupId>mao</groupId>
+        <version>0.0.1</version>
+
+    </parent>
+
+
+    <artifactId>log-spring-boot-starter</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>log-spring-boot-starter</name>
+    <description>log-spring-boot-starter</description>
+
+    <properties>
+        <java.version>11</java.version>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+
+        <!--spring boot starter开发依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>
+                        true
+                    </skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+
+
+
+
+
+
+
+
+子工程use-starter的pom文件：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+
+        <artifactId>spring_boot_starter_demo2</artifactId>
+        <groupId>mao</groupId>
+        <version>0.0.1</version>
+
+    </parent>
+
+
+    <artifactId>use-starter</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>use-starter</name>
+    <description>use-starter</description>
+
+    <properties>
+        <java.version>11</java.version>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+
+
+
+
+
+
+
+
+**第二步：自定义Log注解**
+
+
+
+```java
+package mao.logspringbootstarter.log;
+
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.METHOD) //ElementType.METHOD：只用在方法上
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Log
+{
+    /**
+     * 方法的描述信息
+     *
+     * @return {@link String}
+     */
+    String desc() default "";
+}
+```
+
+
+
+
+
+**第三步：自定义日志拦截器LogInterceptor**
+
+
+
+
+
+```java
+package mao.logspringbootstarter.interceptor;
+
+import mao.logspringbootstarter.log.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
+
+/**
+ * Project name(项目名称)：spring_boot_starter_demo2
+ * Package(包名): mao.logspringbootstarter.interceptor
+ * Class(类名): LogInterceptor
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/24
+ * Time(创建时间)： 22:39
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class LogInterceptor implements HandlerInterceptor
+{
+
+    private static final ThreadLocal<Long> THREAD_LOCAL = new ThreadLocal<>();
+
+    private static final Logger logger = LoggerFactory.getLogger(LogInterceptor.class);
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception
+    {
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        Method method = handlerMethod.getMethod();
+        Log log = method.getAnnotation(Log.class);
+        if (log != null)
+        {
+            long startTime = System.currentTimeMillis();
+            THREAD_LOCAL.set(startTime);
+        }
+        return true;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)
+            throws Exception
+    {
+        long endTime = System.currentTimeMillis();
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        Method method = handlerMethod.getMethod();
+        Log log = method.getAnnotation(Log.class);
+        if (log != null)
+        {
+            Long startTime = THREAD_LOCAL.get();
+            long runTime = endTime - startTime;
+            String uri = request.getRequestURI();
+            String methodName = method.getDeclaringClass().getName() + "." + method.getName();
+            String desc = log.desc();
+            logger.info("请求的url：" + uri + "，方法名：" + methodName + "，描述：" + desc + "，运行时间：" + runTime);
+        }
+    }
+}
+```
+
+
+
+
+
+
+
+**第四步：创建自动配置类LogAutoConfiguration，用于自动配置拦截器、参数解析器等web组件**
+
+
+
+```java
+package mao.logspringbootstarter.config;
+
+import mao.logspringbootstarter.interceptor.LogInterceptor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+/**
+ * Project name(项目名称)：spring_boot_starter_demo2
+ * Package(包名): mao.logspringbootstarter.config
+ * Class(类名): LogAutoConfiguration
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/24
+ * Time(创建时间)： 22:51
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+@Configuration
+public class LogAutoConfiguration implements WebMvcConfigurer
+{
+    @Override
+    public void addInterceptors(InterceptorRegistry registry)
+    {
+        registry.addInterceptor(new LogInterceptor());
+    }
+}
+```
+
+
+
+
+
+
+
+**第五步：在spring.factories中追加LogAutoConfiguration配置**
+
+
+
+```
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  mao.logspringbootstarter.config.LogAutoConfiguration
+```
+
+
+
+
+
+**第六步：安装到本地库**
+
+
+
+![image-20221024225648355](img/自定义Spring Boot starter/image-20221024225648355.png)
+
+
+
+
+
+```sh
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< mao:log-spring-boot-starter >---------------------
+[INFO] Building log-spring-boot-starter 0.0.1-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.2.0:resources (default-resources) @ log-spring-boot-starter ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] Copying 0 resource
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.10.1:compile (default-compile) @ log-spring-boot-starter ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 4 source files to H:\程序\大四上期\spring_boot_starter_demo2\log-spring-boot-starter\target\classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.2.0:testResources (default-testResources) @ log-spring-boot-starter ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] skip non existing resourceDirectory H:\程序\大四上期\spring_boot_starter_demo2\log-spring-boot-starter\src\test\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.10.1:testCompile (default-testCompile) @ log-spring-boot-starter ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.22.2:test (default-test) @ log-spring-boot-starter ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- maven-jar-plugin:3.2.2:jar (default-jar) @ log-spring-boot-starter ---
+[INFO] Building jar: H:\程序\大四上期\spring_boot_starter_demo2\log-spring-boot-starter\target\log-spring-boot-starter-0.0.1-SNAPSHOT.jar
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:2.7.1:repackage (repackage) @ log-spring-boot-starter ---
+[INFO] 
+[INFO] --- maven-install-plugin:2.5.2:install (default-install) @ log-spring-boot-starter ---
+[INFO] Installing H:\程序\大四上期\spring_boot_starter_demo2\log-spring-boot-starter\target\log-spring-boot-starter-0.0.1-SNAPSHOT.jar to C:\Users\mao\.m2\repository\mao\log-spring-boot-starter\0.0.1-SNAPSHOT\log-spring-boot-starter-0.0.1-SNAPSHOT.jar
+[INFO] Installing H:\程序\大四上期\spring_boot_starter_demo2\log-spring-boot-starter\pom.xml to C:\Users\mao\.m2\repository\mao\log-spring-boot-starter\0.0.1-SNAPSHOT\log-spring-boot-starter-0.0.1-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.665 s
+[INFO] Finished at: 2022-10-24T22:56:59+08:00
+[INFO] ------------------------------------------------------------------------
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### 使用starter
+
+
+
+**第一步：添加依赖**
+
+
+
