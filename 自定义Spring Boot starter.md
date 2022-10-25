@@ -2262,6 +2262,22 @@ http://localhost:8080/test1
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!--spring boot starter开发依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -2277,6 +2293,7 @@ http://localhost:8080/test1
     </build>
 
 </project>
+
 ```
 
 
@@ -2601,6 +2618,8 @@ public class IpCountService
 package mao.ipspringbootstarter.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
 
 /**
  * Project name(项目名称)：spring_boot_starter_demo3
@@ -2616,6 +2635,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 
 
+@Component
 @ConfigurationProperties(prefix = "tools.ip")
 public class IpConfigurationProperties
 {
@@ -2635,7 +2655,7 @@ public class IpConfigurationProperties
     /**
      * 日志输出模式 detail:明细模式 simple:极简模式
      */
-    private String model = LogModel.DETAIL.value;
+    private String mode = LogModel.DETAIL.value;
 
 
     /**
@@ -2651,7 +2671,7 @@ public class IpConfigurationProperties
          * Simple log model.
          */
         SIMPLE("simple");
-        
+
         private String value;
 
         LogModel(String value)
@@ -2676,7 +2696,7 @@ public class IpConfigurationProperties
      */
     public IpConfigurationProperties()
     {
-        
+
     }
 
     /**
@@ -2684,13 +2704,13 @@ public class IpConfigurationProperties
      *
      * @param cycle      the cycle
      * @param cycleReset the cycle reset
-     * @param model      the model
+     * @param mode       the mode
      */
-    public IpConfigurationProperties(long cycle, Boolean cycleReset, String model)
+    public IpConfigurationProperties(long cycle, Boolean cycleReset, String mode)
     {
         this.cycle = cycle;
         this.cycleReset = cycleReset;
-        this.model = model;
+        this.mode = mode;
     }
 
     /**
@@ -2734,23 +2754,23 @@ public class IpConfigurationProperties
     }
 
     /**
-     * Gets model.
+     * Gets mode.
      *
-     * @return the model
+     * @return the mode
      */
-    public String getModel()
+    public String getMode()
     {
-        return model;
+        return mode;
     }
 
     /**
-     * Sets model.
+     * Sets mode.
      *
-     * @param model the model
+     * @param mode the mode
      */
-    public void setModel(String model)
+    public void setMode(String mode)
     {
-        this.model = model;
+        this.mode = mode;
     }
 
     @Override
@@ -2760,10 +2780,11 @@ public class IpConfigurationProperties
         final StringBuilder stringbuilder = new StringBuilder();
         stringbuilder.append("cycle：").append(cycle).append('\n');
         stringbuilder.append("cycleReset：").append(cycleReset).append('\n');
-        stringbuilder.append("model：").append(model).append('\n');
+        stringbuilder.append("mode：").append(mode).append('\n');
         return stringbuilder.toString();
     }
 }
+
 ```
 
 
@@ -2820,3 +2841,519 @@ public class IpAutoConfiguration
 
 
 **第九步：根据配置切换设置**
+
+
+
+```java
+package mao.ipspringbootstarter.service;
+
+import mao.ipspringbootstarter.config.IpConfigurationProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Project name(项目名称)：spring_boot_starter_demo3
+ * Package(包名): mao.ipspringbootstarter.service
+ * Class(类名): IpCountService
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/25
+ * Time(创建时间)： 13:40
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class IpCountService
+{
+    private final Map<String, Integer> ipCountMap = new ConcurrentHashMap<>();
+
+    private static final Logger log = LoggerFactory.getLogger(IpCountService.class);
+
+    @Autowired
+    private IpConfigurationProperties ipConfigurationProperties;
+
+    @Autowired
+    private HttpServletRequest request;
+
+    /**
+     * 记录某个IP访问该网站的次数
+     */
+    public void count()
+    {
+        String ipAddress = request.getRemoteAddr();
+        if (ipCountMap.containsKey(ipAddress))
+        {
+            synchronized (ipAddress.intern())
+            {
+                ipCountMap.put(ipAddress, ipCountMap.get(ipAddress) + 1);
+            }
+        }
+        else
+        {
+            ipCountMap.put(ipAddress, 1);
+        }
+        log.debug("IP:" + ipAddress);
+    }
+
+
+    /**
+     * 定时打印一个表格
+     */
+    @Scheduled(cron = "0/10 * * * * ?")
+    public void print()
+    {
+
+        //模式切换
+        if (ipConfigurationProperties.getMode().equals(IpConfigurationProperties.LogModel.DETAIL.getValue()))
+        {
+            //明细模式
+            detailPrint();
+        }
+        else if (ipConfigurationProperties.getMode().equals(IpConfigurationProperties.LogModel.SIMPLE.getValue()))
+        {
+            //极简模式
+            simplePrint();
+        }
+
+        //周期内重置数据
+        if (ipConfigurationProperties.getCycleReset())
+        {
+            ipCountMap.clear();
+        }
+    }
+
+
+    /**
+     * 更详细的输出
+     */
+    private void detailPrint()
+    {
+        StringBuilder stringBuilder = new StringBuilder(" IP访问监控\n");
+        stringBuilder.append("+-----ip-address-----+--num--+\n");
+
+        for (Map.Entry<String, Integer> info : ipCountMap.entrySet())
+        {
+            String key = info.getKey();
+            Integer count = info.getValue();
+            String lineInfo = String.format("|%18s |%6d |", key, count);
+            stringBuilder.append(lineInfo).append("\n");
+        }
+        stringBuilder.append("+--------------------+-------+");
+        log.info(stringBuilder.toString());
+    }
+
+
+    /**
+     * 简单的输出
+     */
+    private void simplePrint()
+    {
+        StringBuilder stringBuilder = new StringBuilder(" IP访问监控\n");
+        stringBuilder.append("+-----ip-address--------+\n");
+
+        for (Map.Entry<String, Integer> info : ipCountMap.entrySet())
+        {
+            String key = info.getKey();
+            String lineInfo = String.format("|%18s   |", key);
+            stringBuilder.append(lineInfo).append("\n");
+        }
+        stringBuilder.append("+--------------------+-------+");
+        log.info(stringBuilder.toString());
+    }
+
+
+}
+```
+
+
+
+
+
+
+
+**第十步：使用#{beanName.attrName}读取bean的属性**
+
+
+
+```java
+package mao.ipspringbootstarter.service;
+
+import mao.ipspringbootstarter.config.IpConfigurationProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Project name(项目名称)：spring_boot_starter_demo3
+ * Package(包名): mao.ipspringbootstarter.service
+ * Class(类名): IpCountService
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/25
+ * Time(创建时间)： 13:40
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class IpCountService
+{
+    private final Map<String, Integer> ipCountMap = new ConcurrentHashMap<>();
+
+    private static final Logger log = LoggerFactory.getLogger(IpCountService.class);
+
+    @Autowired
+    private IpConfigurationProperties ipConfigurationProperties;
+
+    @Autowired
+    private HttpServletRequest request;
+
+    /**
+     * 记录某个IP访问该网站的次数
+     */
+    public void count()
+    {
+        String ipAddress = request.getRemoteAddr();
+        if (ipCountMap.containsKey(ipAddress))
+        {
+            synchronized (ipAddress.intern())
+            {
+                ipCountMap.put(ipAddress, ipCountMap.get(ipAddress) + 1);
+            }
+        }
+        else
+        {
+            ipCountMap.put(ipAddress, 1);
+        }
+        log.debug("IP:" + ipAddress);
+    }
+
+
+    /**
+     * 定时打印一个表格
+     */
+    @Scheduled(cron = "0/#{ipConfigurationProperties.cycle} * * * * ?")
+    public void print()
+    {
+
+        //模式切换
+        if (ipConfigurationProperties.getMode().equals(IpConfigurationProperties.LogModel.DETAIL.getValue()))
+        {
+            //明细模式
+            detailPrint();
+        }
+        else if (ipConfigurationProperties.getMode().equals(IpConfigurationProperties.LogModel.SIMPLE.getValue()))
+        {
+            //极简模式
+            simplePrint();
+        }
+
+        //周期内重置数据
+        if (ipConfigurationProperties.getCycleReset())
+        {
+            ipCountMap.clear();
+        }
+    }
+
+
+    /**
+     * 更详细的输出
+     */
+    private void detailPrint()
+    {
+        StringBuilder stringBuilder = new StringBuilder(" IP访问监控\n");
+        stringBuilder.append("+-----ip-address-----+--num--+\n");
+
+        for (Map.Entry<String, Integer> info : ipCountMap.entrySet())
+        {
+            String key = info.getKey();
+            Integer count = info.getValue();
+            String lineInfo = String.format("|%18s |%6d |", key, count);
+            stringBuilder.append(lineInfo).append("\n");
+        }
+        stringBuilder.append("+--------------------+-------+");
+        log.info(stringBuilder.toString());
+    }
+
+
+    /**
+     * 简单的输出
+     */
+    private void simplePrint()
+    {
+        StringBuilder stringBuilder = new StringBuilder(" IP访问监控\n");
+        stringBuilder.append("+-----ip-address--------+\n");
+
+        for (Map.Entry<String, Integer> info : ipCountMap.entrySet())
+        {
+            String key = info.getKey();
+            String lineInfo = String.format("|%18s   |", key);
+            stringBuilder.append(lineInfo).append("\n");
+        }
+        stringBuilder.append("+--------------------+-------+");
+        log.info(stringBuilder.toString());
+    }
+
+
+}
+```
+
+
+
+
+
+
+
+
+
+**第十一步：自定义拦截器IpInterceptor**
+
+
+
+```java
+package mao.ipspringbootstarter.interceptor;
+
+import mao.ipspringbootstarter.service.IpCountService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * Project name(项目名称)：spring_boot_starter_demo3
+ * Package(包名): mao.ipspringbootstarter.interceptor
+ * Class(类名): IpInterceptor
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/25
+ * Time(创建时间)： 14:19
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class IpInterceptor implements HandlerInterceptor
+{
+
+    @Autowired
+    private IpCountService ipCountService;
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception
+    {
+        ipCountService.count();
+        return true;
+    }
+}
+```
+
+
+
+
+
+**第十二步：注册拦截器IpInterceptor**
+
+
+
+```java
+package mao.ipspringbootstarter.config;
+
+import mao.ipspringbootstarter.interceptor.IpInterceptor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+/**
+ * Project name(项目名称)：spring_boot_starter_demo3
+ * Package(包名): mao.ipspringbootstarter.config
+ * Class(类名): SpringMvcConfig
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/25
+ * Time(创建时间)： 14:22
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+@Configuration
+public class SpringMvcConfig implements WebMvcConfigurer
+{
+    @Bean
+    public IpInterceptor ipInterceptor()
+    {
+        return new IpInterceptor();
+    }
+
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry)
+    {
+        //proxyBeanMethods默认为true，不是直接new，是从容器里拿
+        registry.addInterceptor(ipInterceptor());
+    }
+
+    
+}
+```
+
+
+
+
+
+**第十三步：更改spring.factories文件**
+
+
+
+```
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  mao.ipspringbootstarter.config.IpAutoConfiguration,\
+  mao.ipspringbootstarter.config.SpringMvcConfig
+```
+
+
+
+
+
+
+
+**第十四步：自定义提示功能**
+
+
+
+在resources/META-INF目录下创建**additional-spring-configuration-metadata.json**
+
+
+
+![image-20221025143148681](img/自定义Spring Boot starter/image-20221025143148681.png)
+
+
+
+
+
+```json
+{
+  "hints": [
+    {
+      "name": "tools.ip.mode",
+      "values": [
+        {
+          "value": "detail",
+          "description": "明细模式."
+        },
+        {
+          "value": "simple",
+          "description": "极简模式."
+        }
+      ]
+    }
+  ]
+}
+```
+
+
+
+
+
+![image-20221025144558636](img/自定义Spring Boot starter/image-20221025144558636.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 使用starter
+
+
+
+**第一步：添加依赖**
+
+
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+     <artifactId>spring_boot_starter_demo3</artifactId>
+        <groupId>mao</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+
+    <artifactId>use-starter</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>use-starter</name>
+    <description>use-starter</description>
+
+    <properties>
+
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>mao</groupId>
+            <artifactId>ip-spring-boot-starter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+
+
+
+
+
+
+**第二步：编写配置文件**
+
