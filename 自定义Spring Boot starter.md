@@ -2635,7 +2635,7 @@ import org.springframework.stereotype.Component;
  */
 
 
-@Component
+@Component("ipConfigurationProperties")
 @ConfigurationProperties(prefix = "tools.ip")
 public class IpConfigurationProperties
 {
@@ -2805,6 +2805,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -2822,6 +2823,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @Configuration
+@Import(IpConfigurationProperties.class)
 @EnableConfigurationProperties(IpConfigurationProperties.class)
 public class IpAutoConfiguration
 {
@@ -2832,6 +2834,7 @@ public class IpAutoConfiguration
         return new IpCountService();
     }
 }
+
 ```
 
 
@@ -3357,3 +3360,197 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 **第二步：编写配置文件**
 
+
+
+![image-20221025151707135](img/自定义Spring Boot starter/image-20221025151707135.png)
+
+
+
+![image-20221025151801302](img/自定义Spring Boot starter/image-20221025151801302.png)
+
+
+
+
+
+```yaml
+tools:
+  ip:
+    cycle: 5
+    mode: detail
+    cycle-reset: false
+```
+
+
+
+
+
+
+
+**第三步：启动程序**
+
+
+
+```sh
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v2.7.1)
+
+2022-10-25 15:19:06.941  INFO 13892 --- [           main] mao.usestarter.UseStarterApplication     : Starting UseStarterApplication using Java 16.0.2 on mao with PID 13892 (H:\程序\大四上期\spring_boot_starter_demo3\use-starter\target\classes started by mao in H:\程序\大四上期\spring_boot_starter_demo3)
+2022-10-25 15:19:06.944  INFO 13892 --- [           main] mao.usestarter.UseStarterApplication     : No active profile set, falling back to 1 default profile: "default"
+2022-10-25 15:19:07.620  INFO 13892 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2022-10-25 15:19:07.628  INFO 13892 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-10-25 15:19:07.628  INFO 13892 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
+2022-10-25 15:19:07.701  INFO 13892 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-10-25 15:19:07.702  INFO 13892 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 713 ms
+2022-10-25 15:19:07.983  INFO 13892 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2022-10-25 15:19:07.994  INFO 13892 --- [           main] mao.usestarter.UseStarterApplication     : Started UseStarterApplication in 1.362 seconds (JVM running for 1.835)
+2022-10-25 15:19:10.011  INFO 13892 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
++--------------------+-------+
+2022-10-25 15:19:15.007  INFO 13892 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
++--------------------+-------+
+2022-10-25 15:19:20.006  INFO 13892 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
++--------------------+-------+
+2022-10-25 15:19:25.004  INFO 13892 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
++--------------------+-------+
+```
+
+
+
+
+
+**第四步：访问服务，查看日志**
+
+
+
+```sh
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |     4 |
++--------------------+-------+
+2022-10-25 15:20:15.011  INFO 13892 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    18 |
++--------------------+-------+
+2022-10-25 15:20:20.007  INFO 13892 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    44 |
++--------------------+-------+
+2022-10-25 15:20:25.017  INFO 13892 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    72 |
++--------------------+-------+
+2022-10-25 15:20:30.002  INFO 13892 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    72 |
++--------------------+-------+
+2022-10-25 15:20:35.010  INFO 13892 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    80 |
++--------------------+-------+
+2022-10-25 15:20:40.006  INFO 13892 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    80 |
++--------------------+-------+
+```
+
+
+
+
+
+**第五步：更改统计速度**
+
+
+
+```yaml
+tools:
+  ip:
+    cycle: 1
+    mode: detail
+    cycle-reset: false
+```
+
+
+
+
+
+
+
+
+
+**第六步：重启服务，访问服务，查看日志**
+
+
+
+```sh
++-----ip-address-----+--num--+
++--------------------+-------+
+2022-10-25 15:23:20.007  INFO 4616 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
++--------------------+-------+
+2022-10-25 15:23:21.011  INFO 4616 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
++--------------------+-------+
+2022-10-25 15:23:21.735  INFO 4616 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-10-25 15:23:21.735  INFO 4616 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-10-25 15:23:21.736  INFO 4616 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2022-10-25 15:23:22.006  INFO 4616 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |     4 |
++--------------------+-------+
+2022-10-25 15:23:23.014  INFO 4616 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    10 |
++--------------------+-------+
+2022-10-25 15:23:24.005  INFO 4616 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    22 |
++--------------------+-------+
+2022-10-25 15:23:25.015  INFO 4616 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    30 |
++--------------------+-------+
+2022-10-25 15:23:26.010  INFO 4616 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    40 |
++--------------------+-------+
+2022-10-25 15:23:27.005  INFO 4616 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    44 |
++--------------------+-------+
+2022-10-25 15:23:28.003  INFO 4616 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    46 |
++--------------------+-------+
+2022-10-25 15:23:29.013  INFO 4616 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    46 |
++--------------------+-------+
+2022-10-25 15:23:30.011  INFO 4616 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    46 |
++--------------------+-------+
+```
+
+
+
+
+
+**第七步：更改模式**
+
+
+
+```yaml
+tools:
+  ip:
+    cycle: 3
+    mode: simple
+    cycle-reset: false
+```
