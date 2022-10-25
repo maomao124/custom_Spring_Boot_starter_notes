@@ -2,7 +2,7 @@
 
 [TOC]
 
-
+---
 
 
 
@@ -2133,7 +2133,7 @@ http://localhost:8080/test1
 
 
 
-**第一步：初始化项目**
+##### **第一步：初始化项目**
 
 
 
@@ -2361,7 +2361,7 @@ http://localhost:8080/test1
 
 
 
-**第二步：编写IpCountService业务**
+##### **第二步：编写IpCountService业务**
 
 
 
@@ -2424,7 +2424,7 @@ public class IpCountService
 
 
 
-**第三步：编写配置类IpAutoConfiguration**
+##### **第三步：编写配置类IpAutoConfiguration**
 
 
 
@@ -2463,7 +2463,7 @@ public class IpAutoConfiguration
 
 
 
-**第四步：在spring.factories中追加IpAutoConfiguration配置**
+##### **第四步：在spring.factories中追加IpAutoConfiguration配置**
 
 
 
@@ -2478,7 +2478,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 
 
-**第五步：开启定时任务功能**
+##### **第五步：开启定时任务功能**
 
 
 
@@ -2523,7 +2523,7 @@ public class IpAutoConfiguration
 
 
 
-**第六步：设置定时任务**
+##### **第六步：设置定时任务**
 
 
 
@@ -2610,7 +2610,7 @@ public class IpCountService
 
 
 
-**第七步：定义属性类，加载对应属性**
+##### **第七步：定义属性类，加载对应属性**
 
 
 
@@ -2793,7 +2793,7 @@ public class IpConfigurationProperties
 
 
 
-**第八步：设置加载Properties类为bean**
+##### **第八步：设置加载Properties类为bean**
 
 
 
@@ -2843,7 +2843,7 @@ public class IpAutoConfiguration
 
 
 
-**第九步：根据配置切换设置**
+##### **第九步：根据配置切换设置**
 
 
 
@@ -2981,7 +2981,7 @@ public class IpCountService
 
 
 
-**第十步：使用#{beanName.attrName}读取bean的属性**
+##### **第十步：使用#{beanName.attrName}读取bean的属性**
 
 
 
@@ -3121,7 +3121,7 @@ public class IpCountService
 
 
 
-**第十一步：自定义拦截器IpInterceptor**
+##### **第十一步：自定义拦截器IpInterceptor**
 
 
 
@@ -3168,7 +3168,7 @@ public class IpInterceptor implements HandlerInterceptor
 
 
 
-**第十二步：注册拦截器IpInterceptor**
+##### **第十二步：注册拦截器IpInterceptor**
 
 
 
@@ -3208,18 +3208,19 @@ public class SpringMvcConfig implements WebMvcConfigurer
     public void addInterceptors(InterceptorRegistry registry)
     {
         //proxyBeanMethods默认为true，不是直接new，是从容器里拿
-        registry.addInterceptor(ipInterceptor());
+        registry.addInterceptor(ipInterceptor()).excludePathPatterns("/error");
     }
 
-    
+
 }
+
 ```
 
 
 
 
 
-**第十三步：更改spring.factories文件**
+##### **第十三步：更改spring.factories文件**
 
 
 
@@ -3235,7 +3236,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 
 
-**第十四步：自定义提示功能**
+##### **第十四步：自定义提示功能**
 
 
 
@@ -3293,7 +3294,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 
 
-**第一步：添加依赖**
+##### **第一步：添加依赖**
 
 
 
@@ -3358,7 +3359,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 
 
-**第二步：编写配置文件**
+##### **第二步：编写配置文件**
 
 
 
@@ -3386,7 +3387,7 @@ tools:
 
 
 
-**第三步：启动程序**
+##### **第三步：启动程序**
 
 
 
@@ -3427,7 +3428,7 @@ tools:
 
 
 
-**第四步：访问服务，查看日志**
+##### **第四步：访问服务，查看日志**
 
 
 
@@ -3465,7 +3466,7 @@ tools:
 
 
 
-**第五步：更改统计速度**
+##### **第五步：更改统计速度**
 
 
 
@@ -3485,7 +3486,7 @@ tools:
 
 
 
-**第六步：重启服务，访问服务，查看日志**
+##### **第六步：重启服务，访问服务，查看日志**
 
 
 
@@ -3543,7 +3544,7 @@ tools:
 
 
 
-**第七步：更改模式**
+##### **第七步：更改模式**
 
 
 
@@ -3554,3 +3555,160 @@ tools:
     mode: simple
     cycle-reset: false
 ```
+
+
+
+
+
+
+
+##### **第八步：重启服务，访问服务，查看日志**
+
+
+
+```sh
+2022-10-25 15:26:21.006  INFO 17512 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address--------+
+|    142.93.242.135   |
+|   0:0:0:0:0:0:0:1   |
++--------------------+-------+
+2022-10-25 15:26:24.007  INFO 17512 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address--------+
+|    142.93.242.135   |
+|   0:0:0:0:0:0:0:1   |
++--------------------+-------+
+2022-10-25 15:26:27.007  INFO 17512 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address--------+
+|    142.93.242.135   |
+|   0:0:0:0:0:0:0:1   |
++--------------------+-------+
+2022-10-25 15:26:30.007  INFO 17512 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address--------+
+|    142.93.242.135   |
+|   0:0:0:0:0:0:0:1   |
++--------------------+-------+
+2022-10-25 15:26:33.007  INFO 17512 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address--------+
+|    142.93.242.135   |
+|   0:0:0:0:0:0:0:1   |
++--------------------+-------+
+2022-10-25 15:26:36.014  INFO 17512 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address--------+
+|    142.93.242.135   |
+|   0:0:0:0:0:0:0:1   |
++--------------------+-------+
+2022-10-25 15:26:39.010  INFO 17512 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address--------+
+|    142.93.242.135   |
+|   0:0:0:0:0:0:0:1   |
++--------------------+-------+
+2022-10-25 15:26:42.002  INFO 17512 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address--------+
+|    142.93.242.135   |
+|   0:0:0:0:0:0:0:1   |
++--------------------+-------+
+2022-10-25 15:26:45.002  INFO 17512 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address--------+
+|    142.93.242.135   |
+|   0:0:0:0:0:0:0:1   |
++--------------------+-------+
+2022-10-25 15:26:48.012  INFO 17512 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address--------+
+|    142.93.242.135   |
+|   0:0:0:0:0:0:0:1   |
++--------------------+-------+
+2022-10-25 15:26:51.009  INFO 17512 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address--------+
+|    142.93.242.135   |
+|   0:0:0:0:0:0:0:1   |
++--------------------+-------+
+2022-10-25 15:26:54.002  INFO 17512 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address--------+
+|    142.93.242.135   |
+|   0:0:0:0:0:0:0:1   |
++--------------------+-------+
+```
+
+
+
+
+
+##### **第九步：是否周期内重置数据选项**
+
+
+
+```yaml
+tools:
+  ip:
+    cycle: 3
+    mode: detail
+    cycle-reset: true
+```
+
+
+
+
+
+##### **第十步：重启服务，访问服务，查看日志**
+
+
+
+```sh
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    22 |
++--------------------+-------+
+2022-10-25 15:29:24.004  INFO 7680 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |    12 |
++--------------------+-------+
+2022-10-25 15:29:27.014  INFO 7680 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |     4 |
++--------------------+-------+
+2022-10-25 15:29:30.006  INFO 7680 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |     6 |
++--------------------+-------+
+2022-10-25 15:29:33.004  INFO 7680 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
+|   0:0:0:0:0:0:0:1 |     8 |
++--------------------+-------+
+2022-10-25 15:29:36.011  INFO 7680 --- [   scheduling-1] m.i.service.IpCountService               :  IP访问监控
++-----ip-address-----+--num--+
++--------------------+-------+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+end
+
+---
+
+by mao
+
+2022  10  25
+
+---
+
