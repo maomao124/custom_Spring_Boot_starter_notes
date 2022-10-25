@@ -1,5 +1,25 @@
 
 
+[TOC]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Spring Boot starter
@@ -433,7 +453,7 @@ org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration
 
 
 
-**第一步：初始化项目**
+##### **第一步：初始化项目**
 
 
 
@@ -768,7 +788,7 @@ use-starter的pom文件：
 
 
 
-**第二步：创建配置属性类HelloConfigProperties**
+##### **第二步：创建配置属性类HelloConfigProperties**
 
 
 
@@ -934,7 +954,7 @@ public class HelloConfigProperties
 
 
 
-**第三步：创建HelloService**
+##### **第三步：创建HelloService**
 
 
 
@@ -992,7 +1012,7 @@ public class HelloService
 
 
 
-**第四步：创建自动配置类HelloServiceAutoConfiguration**
+##### **第四步：创建自动配置类HelloServiceAutoConfiguration**
 
 
 
@@ -1061,7 +1081,7 @@ public class HelloServiceAutoConfiguration
 
 
 
-**第五步：在resources目录下创建META-INF/spring.factories**
+##### **第五步：在resources目录下创建META-INF/spring.factories**
 
 
 
@@ -1098,7 +1118,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 
 
-**第一步：在use-starter子工程中修改pom文件**
+##### **第一步：在use-starter子工程中修改pom文件**
 
 
 
@@ -1168,7 +1188,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 
 
-**第二步：创建application.yml文件添加配置**
+##### **第二步：创建application.yml文件添加配置**
 
 
 
@@ -1189,7 +1209,7 @@ hello:
 
 
 
-**第三步：创建HelloController**
+##### **第三步：创建HelloController**
 
 
 
@@ -1235,7 +1255,7 @@ public class HelloController
 
 
 
-**第四步：启动项目**
+##### **第四步：启动项目**
 
 
 
@@ -1267,7 +1287,7 @@ public class HelloController
 
 
 
-**第五步：访问**
+##### **第五步：访问**
 
 http://localhost:8086/test
 
@@ -1279,7 +1299,7 @@ http://localhost:8086/test
 
 
 
-**第六步：更改配置**
+##### **第六步：更改配置**
 
 
 
@@ -1298,7 +1318,7 @@ hello:
 
 
 
-**第七步：重启服务器，再次访问**
+##### **第七步：重启服务器，再次访问**
 
 
 
@@ -1332,7 +1352,7 @@ hello:
 
 
 
-**第一步：初始化项目**
+##### **第一步：初始化项目**
 
 
 
@@ -1586,7 +1606,7 @@ hello:
 
 
 
-**第二步：自定义Log注解**
+##### **第二步：自定义Log注解**
 
 
 
@@ -1616,7 +1636,7 @@ public @interface Log
 
 
 
-**第三步：自定义日志拦截器LogInterceptor**
+##### **第三步：自定义日志拦截器LogInterceptor**
 
 
 
@@ -1660,13 +1680,16 @@ public class LogInterceptor implements HandlerInterceptor
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception
     {
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
-        Method method = handlerMethod.getMethod();
-        Log log = method.getAnnotation(Log.class);
-        if (log != null)
+        if (handler instanceof HandlerMethod)
         {
-            long startTime = System.currentTimeMillis();
-            THREAD_LOCAL.set(startTime);
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+            Method method = handlerMethod.getMethod();
+            Log log = method.getAnnotation(Log.class);
+            if (log != null)
+            {
+                long startTime = System.currentTimeMillis();
+                THREAD_LOCAL.set(startTime);
+            }
         }
         return true;
     }
@@ -1675,21 +1698,26 @@ public class LogInterceptor implements HandlerInterceptor
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)
             throws Exception
     {
-        long endTime = System.currentTimeMillis();
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
-        Method method = handlerMethod.getMethod();
-        Log log = method.getAnnotation(Log.class);
-        if (log != null)
+        if (handler instanceof HandlerMethod)
         {
-            Long startTime = THREAD_LOCAL.get();
-            long runTime = endTime - startTime;
-            String uri = request.getRequestURI();
-            String methodName = method.getDeclaringClass().getName() + "." + method.getName();
-            String desc = log.desc();
-            logger.info("请求的url：" + uri + "，方法名：" + methodName + "，描述：" + desc + "，运行时间：" + runTime);
+            long endTime = System.currentTimeMillis();
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+            Method method = handlerMethod.getMethod();
+            Log log = method.getAnnotation(Log.class);
+            if (log != null)
+            {
+                Long startTime = THREAD_LOCAL.get();
+                long runTime = endTime - startTime;
+                String uri = request.getRequestURI();
+                String methodName = method.getDeclaringClass().getName() + "." + method.getName();
+                String desc = log.desc();
+                logger.info("请求的url：" + uri + "，方法名：" + methodName + "，描述：" + desc + "，运行时间：" + runTime + "ms");
+                THREAD_LOCAL.remove();
+            }
         }
     }
 }
+
 ```
 
 
@@ -1698,7 +1726,7 @@ public class LogInterceptor implements HandlerInterceptor
 
 
 
-**第四步：创建自动配置类LogAutoConfiguration，用于自动配置拦截器、参数解析器等web组件**
+##### **第四步：创建自动配置类LogAutoConfiguration，用于自动配置拦截器、参数解析器等web组件**
 
 
 
@@ -1741,7 +1769,7 @@ public class LogAutoConfiguration implements WebMvcConfigurer
 
 
 
-**第五步：在spring.factories中追加LogAutoConfiguration配置**
+##### **第五步：在spring.factories中追加LogAutoConfiguration配置**
 
 
 
@@ -1754,7 +1782,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 
 
-**第六步：安装到本地库**
+##### **第六步：安装到本地库**
 
 
 
@@ -1824,7 +1852,276 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 
 
-**第一步：添加依赖**
+##### **第一步：添加依赖**
+
+
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+
+        <artifactId>spring_boot_starter_demo2</artifactId>
+        <groupId>mao</groupId>
+        <version>0.0.1</version>
+
+    </parent>
+
+
+    <artifactId>use-starter</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>use-starter</name>
+    <description>use-starter</description>
+
+    <properties>
+        <java.version>11</java.version>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>mao</groupId>
+            <artifactId>log-spring-boot-starter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+
+
+
+
+
+
+##### **第二步：编写controller类**
+
+
+
+```java
+package mao.usestarter.controller;
+
+import mao.logspringbootstarter.log.Log;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * Project name(项目名称)：spring_boot_starter_demo2
+ * Package(包名): mao.usestarter.controller
+ * Class(类名): TestController
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/24
+ * Time(创建时间)： 23:01
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+@RestController
+public class TestController
+{
+    /**
+     * test1
+     *
+     * @return {@link String}
+     */
+    @GetMapping("/test1")
+    @Log
+    public String test1()
+    {
+        return "1 success";
+    }
+
+    /**
+     * test2
+     *
+     * @return {@link String}
+     */
+    @GetMapping("/test2")
+    @Log
+    public String test2()
+    {
+        try
+        {
+            Thread.sleep(200);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+        return "2 success";
+    }
+
+    /**
+     * test3
+     *
+     * @return {@link String}
+     */
+    @GetMapping("/test3")
+    @Log
+    public String test3()
+    {
+        try
+        {
+            Thread.sleep(500);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+        return "3 success";
+    }
+
+    /**
+     * test4
+     *
+     * @return {@link String}
+     */
+    @GetMapping("/test4")
+    @Log
+    public String test4()
+    {
+        try
+        {
+            Thread.sleep(1000);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+        return "4 success";
+    }
+
+    /**
+     * test5
+     *
+     * @return {@link String}
+     */
+    @GetMapping("/test5")
+    @Log(desc = "这是test5方法的描述信息")
+    public String test5()
+    {
+        return "5 success";
+    }
+
+    /**
+     * test6
+     *
+     * @return {@link String}
+     */
+    @GetMapping("/test6")
+    public String test6()
+    {
+        return "6 success";
+    }
+}
+
+```
+
+
+
+
+
+##### **第三步：启动程序**
+
+
+
+```sh
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v2.7.1)
+
+2022-10-24 23:23:08.546  INFO 2356 --- [           main] mao.usestarter.UseStarterApplication     : Starting UseStarterApplication using Java 16.0.2 on mao with PID 2356 (H:\程序\大四上期\spring_boot_starter_demo2\use-starter\target\classes started by mao in H:\程序\大四上期\spring_boot_starter_demo2)
+2022-10-24 23:23:08.548  INFO 2356 --- [           main] mao.usestarter.UseStarterApplication     : No active profile set, falling back to 1 default profile: "default"
+2022-10-24 23:23:09.216  INFO 2356 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2022-10-24 23:23:09.223  INFO 2356 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-10-24 23:23:09.223  INFO 2356 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
+2022-10-24 23:23:09.303  INFO 2356 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-10-24 23:23:09.304  INFO 2356 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 721 ms
+2022-10-24 23:23:09.547  INFO 2356 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2022-10-24 23:23:09.556  INFO 2356 --- [           main] mao.usestarter.UseStarterApplication     : Started UseStarterApplication in 1.267 seconds (JVM running for 1.74)
+```
+
+
+
+
+
+
+
+##### **第四步：访问服务**
+
+http://localhost:8080/test1
+
+
+
+从test1到test6，每个资源请求3遍：
+
+```sh
+2022-10-24 23:26:03.034  INFO 8120 --- [nio-8080-exec-6] m.l.interceptor.LogInterceptor           : 请求的url：/test1，方法名：mao.usestarter.controller.TestController.test1，描述：，运行时间：1ms
+2022-10-24 23:26:04.392  INFO 8120 --- [nio-8080-exec-7] m.l.interceptor.LogInterceptor           : 请求的url：/test1，方法名：mao.usestarter.controller.TestController.test1，描述：，运行时间：1ms
+2022-10-24 23:26:05.006  INFO 8120 --- [nio-8080-exec-8] m.l.interceptor.LogInterceptor           : 请求的url：/test1，方法名：mao.usestarter.controller.TestController.test1，描述：，运行时间：1ms
+2022-10-24 23:26:07.567  INFO 8120 --- [nio-8080-exec-9] m.l.interceptor.LogInterceptor           : 请求的url：/test2，方法名：mao.usestarter.controller.TestController.test2，描述：，运行时间：215ms
+2022-10-24 23:26:08.724  INFO 8120 --- [io-8080-exec-10] m.l.interceptor.LogInterceptor           : 请求的url：/test2，方法名：mao.usestarter.controller.TestController.test2，描述：，运行时间：212ms
+2022-10-24 23:26:09.500  INFO 8120 --- [nio-8080-exec-1] m.l.interceptor.LogInterceptor           : 请求的url：/test2，方法名：mao.usestarter.controller.TestController.test2，描述：，运行时间：211ms
+2022-10-24 23:26:12.514  INFO 8120 --- [nio-8080-exec-3] m.l.interceptor.LogInterceptor           : 请求的url：/test3，方法名：mao.usestarter.controller.TestController.test3，描述：，运行时间：510ms
+2022-10-24 23:26:13.597  INFO 8120 --- [nio-8080-exec-2] m.l.interceptor.LogInterceptor           : 请求的url：/test3，方法名：mao.usestarter.controller.TestController.test3，描述：，运行时间：503ms
+2022-10-24 23:26:14.892  INFO 8120 --- [nio-8080-exec-4] m.l.interceptor.LogInterceptor           : 请求的url：/test3，方法名：mao.usestarter.controller.TestController.test3，描述：，运行时间：514ms
+2022-10-24 23:26:17.936  INFO 8120 --- [nio-8080-exec-5] m.l.interceptor.LogInterceptor           : 请求的url：/test4，方法名：mao.usestarter.controller.TestController.test4，描述：，运行时间：1011ms
+2022-10-24 23:26:20.464  INFO 8120 --- [nio-8080-exec-6] m.l.interceptor.LogInterceptor           : 请求的url：/test4，方法名：mao.usestarter.controller.TestController.test4，描述：，运行时间：1007ms
+2022-10-24 23:26:22.922  INFO 8120 --- [nio-8080-exec-7] m.l.interceptor.LogInterceptor           : 请求的url：/test4，方法名：mao.usestarter.controller.TestController.test4，描述：，运行时间：1009ms
+2022-10-24 23:26:25.366  INFO 8120 --- [nio-8080-exec-8] m.l.interceptor.LogInterceptor           : 请求的url：/test5，方法名：mao.usestarter.controller.TestController.test5，描述：这是test5方法的描述信息，运行时间：1ms
+2022-10-24 23:26:26.557  INFO 8120 --- [nio-8080-exec-9] m.l.interceptor.LogInterceptor           : 请求的url：/test5，方法名：mao.usestarter.controller.TestController.test5，描述：这是test5方法的描述信息，运行时间：1ms
+2022-10-24 23:26:27.289  INFO 8120 --- [io-8080-exec-10] m.l.interceptor.LogInterceptor           : 请求的url：/test5，方法名：mao.usestarter.controller.TestController.test5，描述：这是test5方法的描述信息，运行时间：1ms
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
